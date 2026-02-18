@@ -710,7 +710,11 @@
 
     /* ── Page sections ──────────────────────────────────────── */
     .page-section { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-    .page-section[hidden] { display: none !important; }
+    .page-section[hidden]    { display: none !important; }
+    #loading-screen[hidden]  { display: none !important; }
+    #auth-screen[hidden]     { display: none !important; }
+    #app-root[hidden]        { display: none !important; }
+    #migration-banner[hidden]{ display: none !important; }
 
     /* Page fade transition */
     .page-fade-out { animation: pageFadeOut 0.14s ease forwards; }
