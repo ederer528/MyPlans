@@ -726,39 +726,32 @@
     @keyframes pageFadeOut { from { opacity:1; transform:translateY(0);    } to { opacity:0; transform:translateY(5px); } }
     @keyframes pageFadeIn  { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0);   } }
 
+    /* ── Lists: horizontal slider navigation ────────────────── */
+    /* #page-lists is a flex column (from .page-section); the slider fills it */
+    #page-lists { overflow: hidden; position: relative; }
+
+    .lists-slider {
+      display: flex; flex-direction: row;
+      flex: 1; min-height: 0;
+      width: 200%;                   /* two full-width panels side by side */
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+    #page-lists.show-detail .lists-slider { transform: translateX(-50%); }
+
+    /* Each panel is half of the 200%-wide slider = 100% of visible area */
+    .lists-overview, .list-detail {
+      width: 50%; flex-shrink: 0; min-width: 0;
+    }
+
     /* ── Lists overview ──────────────────────────────────────── */
     .lists-overview {
-      position: absolute; inset: 0;
       padding: 14px 20px 12px; display: flex; flex-direction: column; gap: 12px;
       overflow-y: auto;
       scrollbar-width: thin; scrollbar-color: var(--scrollbar-color) transparent;
     }
     .lists-overview::-webkit-scrollbar { width: 4px; }
     .lists-overview::-webkit-scrollbar-thumb { background: var(--scrollbar-color); border-radius: 99px; }
-
-    /* ── Lists navigation slide animations ──────────────────── */
-    #page-lists { position: relative; overflow: hidden; flex: 1; min-height: 0; }
-
-    @keyframes listsSlideInRight {
-      from { opacity: 0; transform: translateX(36px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes listsSlideOutLeft {
-      from { opacity: 1; transform: translateX(0); }
-      to   { opacity: 0; transform: translateX(-36px); }
-    }
-    @keyframes listsSlideInLeft {
-      from { opacity: 0; transform: translateX(-36px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes listsSlideOutRight {
-      from { opacity: 1; transform: translateX(0); }
-      to   { opacity: 0; transform: translateX(36px); }
-    }
-    .lists-slide-in-right  { animation: listsSlideInRight  0.28s cubic-bezier(0.16,1,0.3,1) both; }
-    .lists-slide-in-left   { animation: listsSlideInLeft   0.28s cubic-bezier(0.16,1,0.3,1) both; }
-    .lists-slide-out-left  { animation: listsSlideOutLeft  0.18s ease-in both; }
-    .lists-slide-out-right { animation: listsSlideOutRight 0.18s ease-in both; }
     .lists-top-bar { display: flex; align-items: center; justify-content: space-between; }
     .lists-count { font-size: 13px; color: var(--text-2); font-weight: 500; }
     .btn-new-list {
@@ -852,7 +845,7 @@
     .create-list-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
     /* ── List detail ─────────────────────────────────────────── */
-    .list-detail { position: absolute; inset: 0; display: flex; flex-direction: column; overflow: hidden; }
+    .list-detail { display: flex; flex-direction: column; overflow: hidden; }
     .list-detail-header {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 20px 11px;
@@ -1073,17 +1066,18 @@
       /* ─ Form actions buttons — full-width stack on very small */
       .form-actions { gap: 8px; }
 
-      /* ─ Lists overview (absolute-positioned, fills #page-lists) */
+      /* ─ Lists overview (slider panel) */
       .lists-overview {
         padding: 12px 14px;
-        padding-bottom: max(28px, env(safe-area-inset-bottom, 28px));
+        padding-bottom: max(32px, env(safe-area-inset-bottom, 32px));
+        -webkit-overflow-scrolling: touch;
       }
       .lists-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .list-card { padding: 11px 11px 10px; }
       .list-card-icon { font-size: 20px; margin-bottom: 6px; }
       .list-card-name { font-size: 12px; }
       .list-card-meta { font-size: 11px; }
-      /* ─ List detail (absolute-positioned, fills #page-lists) */
+      /* ─ List detail (slider panel) */
       .list-detail-header { padding: 14px 16px 12px; gap: 10px; }
       .list-detail-name   { font-size: 16px; }
       .list-add-row       { padding: 10px 16px; }
@@ -1091,12 +1085,13 @@
       .btn-list-add       { min-height: 44px; min-width: 44px; }
       .list-items-wrap    {
         padding: 8px 14px;
-        padding-bottom: max(32px, env(safe-area-inset-bottom, 32px));
+        padding-bottom: max(40px, env(safe-area-inset-bottom, 40px));
+        -webkit-overflow-scrolling: touch;
       }
       .list-item          { padding: 14px 10px; min-height: 52px; }
       .item-check         { width: 26px; height: 26px; }
       .item-del           { opacity: 0.8; width: 32px; height: 32px; font-size: 18px; }
-      /* Back button — larger, prominent on mobile */
+      /* Back button — larger tap target on mobile */
       .btn-back           { width: 36px; height: 36px; font-size: 18px; border-radius: 10px; }
 
       /* ─ Create-list overlay panel */
@@ -1460,6 +1455,9 @@
     <!-- ═══ Page: My Lists ═══ -->
     <div id="page-lists" class="page-section" hidden>
 
+      <!-- Lists slider: overview and detail sit side-by-side; CSS translateX slides between them -->
+      <div class="lists-slider" id="lists-slider">
+
       <!-- Lists overview -->
       <div class="lists-overview" id="lists-overview">
         <div class="lists-top-bar">
@@ -1469,8 +1467,8 @@
         <div class="lists-grid" id="lists-grid"></div>
       </div>
 
-      <!-- List detail (shown when a list is opened) -->
-      <div class="list-detail" id="list-detail" hidden>
+      <!-- List detail -->
+      <div class="list-detail" id="list-detail">
         <div class="list-detail-header">
           <button class="btn-back" id="btn-back" title="Back to lists">←</button>
           <span class="list-detail-icon" id="list-detail-icon">📋</span>
@@ -1487,7 +1485,9 @@
         <div class="list-items-wrap">
           <ul class="list-items" id="list-items" role="list"></ul>
         </div>
-      </div>
+      </div><!-- end #list-detail -->
+
+      </div><!-- end .lists-slider -->
 
       <!-- Create list overlay -->
       <div class="create-list-overlay" id="create-list-overlay" hidden>
@@ -2770,21 +2770,7 @@ function renderListsPage() {
 }
 
 function renderListsOverview() {
-  const overview = document.getElementById('lists-overview');
-  const detail   = document.getElementById('list-detail');
-  if (!detail.hidden) {
-    detail.classList.add('lists-slide-out-right');
-    setTimeout(() => {
-      detail.hidden = true;
-      detail.classList.remove('lists-slide-out-right');
-      overview.hidden = false;
-      overview.classList.add('lists-slide-in-left');
-      overview.addEventListener('animationend', () => overview.classList.remove('lists-slide-in-left'), { once: true });
-    }, 190);
-  } else {
-    detail.hidden = true;
-    overview.hidden = false;
-  }
+  document.getElementById('page-lists').classList.remove('show-detail');
   const lists = listsState.lists;
   document.getElementById('lists-count').textContent = lists.length === 1 ? '1 list' : `${lists.length} lists`;
   const grid = document.getElementById('lists-grid');
@@ -2818,25 +2804,11 @@ function renderListsOverview() {
 function renderListDetail(listId) {
   const list = listsState.lists.find(l => l.id === listId);
   if (!list) { currentListId = null; renderListsOverview(); return; }
-  const overview = document.getElementById('lists-overview');
-  const detail   = document.getElementById('list-detail');
   document.getElementById('list-detail-icon').textContent = list.icon;
   document.getElementById('list-detail-name').textContent = list.name;
   updateDetailStats(list);
   renderListItems(list);
-  if (!overview.hidden) {
-    overview.classList.add('lists-slide-out-left');
-    setTimeout(() => {
-      overview.hidden = true;
-      overview.classList.remove('lists-slide-out-left');
-      detail.hidden = false;
-      detail.classList.add('lists-slide-in-right');
-      detail.addEventListener('animationend', () => detail.classList.remove('lists-slide-in-right'), { once: true });
-    }, 190);
-  } else {
-    overview.hidden = true;
-    detail.hidden = false;
-  }
+  document.getElementById('page-lists').classList.add('show-detail');
 }
 
 function updateDetailStats(list) {
