@@ -988,10 +988,13 @@
 
       /* ─ Header */
       .app-header {
-        padding: max(16px, calc(env(safe-area-inset-top, 0px) + 16px)) 20px 14px;
+        padding: max(16px, calc(env(safe-area-inset-top, 0px) + 16px)) 16px 14px;
       }
       .app-header h1 { font-size: 20px; }
       .subtitle { font-size: 11px; }
+      /* Hide name text on mobile — show only avatar + sign out */
+      .user-name { display: none; }
+      .header-user { gap: 6px; padding-right: 8px; }
 
       /* ─ Stats */
       .stats-section { padding: 11px 20px 14px; }
@@ -1207,24 +1210,26 @@
       display: flex; align-items: center; justify-content: center; gap: 5px;
     }
 
-    /* ── User Bar ────────────────────────────────────────────── */
-    .user-bar {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 20px 10px;
-      border-bottom: 1px solid var(--glass-border-2);
+    /* ── User info (in header) ───────────────────────────────── */
+    .header-user {
+      display: flex; align-items: center; gap: 7px;
+      padding-right: 10px;
+      border-right: 1px solid var(--glass-border-2);
     }
     .user-avatar {
-      width: 22px; height: 22px; border-radius: 50%;
+      width: 24px; height: 24px; border-radius: 50%;
       background: var(--glass-2); object-fit: cover; flex-shrink: 0;
     }
     .user-name {
-      flex: 1; font-size: 12px; color: var(--text-2);
+      font-size: 12px; color: var(--text-2);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 130px;
     }
     .btn-signout {
       background: transparent; border: 1px solid var(--glass-border);
       color: var(--text-2); font-size: 11px; border-radius: 6px;
       padding: 3px 9px; cursor: pointer; font-family: inherit;
+      white-space: nowrap; flex-shrink: 0;
       transition: background .15s, color .15s;
     }
     .btn-signout:hover { background: var(--glass-2); color: var(--text); }
@@ -1317,17 +1322,15 @@
         <p class="subtitle" id="header-date"></p>
       </div>
       <div class="header-right">
+        <div class="header-user">
+          <img class="user-avatar" id="user-avatar" src="" alt="">
+          <span class="user-name" id="user-name"></span>
+          <button class="btn-signout" id="btn-signout">Sign out</button>
+        </div>
         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Switch theme">☀️</button>
         <span class="header-icon" aria-hidden="true">✦</span>
       </div>
     </header>
-
-    <!-- User bar -->
-    <div class="user-bar" id="user-bar">
-      <img class="user-avatar" id="user-avatar" src="" alt="">
-      <span class="user-name" id="user-name"></span>
-      <button class="btn-signout" id="btn-signout">Sign out</button>
-    </div>
 
     <!-- Migration banner (shown only if localStorage data exists on first login) -->
     <div class="migration-banner" id="migration-banner" hidden>
