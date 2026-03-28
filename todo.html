@@ -728,12 +728,25 @@
 
     /* ── Lists overview ──────────────────────────────────────── */
     .lists-overview {
-      padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 16px;
+      padding: 14px 20px 12px; display: flex; flex-direction: column; gap: 12px;
       flex: 1; overflow-y: auto;
       scrollbar-width: thin; scrollbar-color: var(--scrollbar-color) transparent;
+      transition: max-height 0.3s ease, flex 0.3s ease;
     }
     .lists-overview::-webkit-scrollbar { width: 4px; }
     .lists-overview::-webkit-scrollbar-thumb { background: var(--scrollbar-color); border-radius: 99px; }
+
+    /* Split-view: compact grid strip when a list is open */
+    #page-lists.detail-open .lists-overview {
+      flex: 0 0 auto;
+      max-height: min(180px, 28vh);
+      overflow-y: auto;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    #page-lists.detail-open .list-detail {
+      flex: 1;
+      min-height: 0;
+    }
     .lists-top-bar { display: flex; align-items: center; justify-content: space-between; }
     .lists-count { font-size: 13px; color: var(--text-2); font-weight: 500; }
     .btn-new-list {
@@ -1051,12 +1064,16 @@
       .form-actions { gap: 8px; }
 
       /* ─ Lists overview */
-      .lists-overview { padding: 12px 12px 16px; }
+      .lists-overview { padding: 10px 12px 10px; }
       .lists-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .list-card { padding: 11px 11px 10px; }
       .list-card-icon { font-size: 20px; margin-bottom: 6px; }
       .list-card-name { font-size: 12px; }
       .list-card-meta { font-size: 11px; }
+      /* Compact strip on mobile when detail open */
+      #page-lists.detail-open .lists-overview {
+        max-height: min(160px, 24vh);
+      }
 
       /* ─ List detail */
       .list-detail-header { padding: 12px 16px 10px; gap: 10px; }
@@ -2740,6 +2757,7 @@ function renderListsPage() {
 }
 
 function renderListsOverview() {
+  document.getElementById('page-lists').classList.remove('detail-open');
   document.getElementById('lists-overview').hidden = false;
   document.getElementById('list-detail').hidden    = true;
   const lists = listsState.lists;
@@ -2775,8 +2793,8 @@ function renderListsOverview() {
 function renderListDetail(listId) {
   const list = listsState.lists.find(l => l.id === listId);
   if (!list) { currentListId = null; renderListsOverview(); return; }
-  document.getElementById('lists-overview').hidden = false; // keep in DOM but hide via hidden attr
-  document.getElementById('lists-overview').hidden = true;
+  document.getElementById('page-lists').classList.add('detail-open');
+  document.getElementById('lists-overview').hidden = false;
   document.getElementById('list-detail').hidden    = false;
   document.getElementById('page-lists').style.setProperty('--list-color', list.color);
   document.getElementById('list-detail-icon').textContent = list.icon;
