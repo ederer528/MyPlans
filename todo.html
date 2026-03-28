@@ -255,7 +255,7 @@
       transition: max-height 0.35s ease, opacity 0.28s ease;
       will-change: max-height;
     }
-    .add-form-body.expanded { max-height: 760px; opacity: 1; }
+    .add-form-body.expanded { max-height: 760px; opacity: 1; overflow-y: auto; }
 
     .add-form-inner {
       padding: 4px 28px 22px;
@@ -748,19 +748,19 @@
     .btn-new-list:hover  { opacity: 0.88; box-shadow: 0 6px 22px rgba(59,130,246,0.48); }
     .btn-new-list:active { transform: scale(0.97); }
     .lists-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px;
     }
     .list-card {
-      position: relative; padding: 16px 16px 13px;
+      position: relative; padding: 13px 13px 11px;
       background: var(--glass); border: 1.5px solid var(--glass-border);
       border-radius: var(--radius-sm); cursor: pointer;
       transition: background 0.18s, transform 0.15s, box-shadow 0.15s;
       animation: slideIn 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
     }
     .list-card:hover { background: var(--card-hover-bg); transform: translateY(-2px); box-shadow: var(--shadow-card); }
-    .list-card-icon { font-size: 26px; line-height: 1; margin-bottom: 9px; display: block; }
-    .list-card-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .list-card-meta { font-size: 12px; color: var(--text-2); }
+    .list-card-icon { font-size: 22px; line-height: 1; margin-bottom: 7px; display: block; }
+    .list-card-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .list-card-meta { font-size: 11px; color: var(--text-2); }
     .list-card-bar  { margin-top: 10px; height: 3px; border-radius: 2px; background: var(--glass-2); overflow: hidden; }
     .list-card-bar-fill { height: 100%; border-radius: 2px; background: var(--list-color, var(--accent)); transition: width 0.4s ease; }
     .list-card-del {
@@ -948,24 +948,29 @@
       /* Full-screen layout */
       body {
         padding: 0;
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
         min-height: 100dvh;
+        /* Match card bg so no gap shows behind card on iOS */
+        background: var(--bg-1);
       }
       .page {
         align-items: stretch;
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
         min-height: 100dvh;
-        min-height: 100svh; /* fallback */
       }
       .card {
         max-width: 100%;
         border-radius: 0;
         border: none;
         box-shadow: none;
-        max-height: 100dvh;
-        max-height: 100svh;
+        /* Use -webkit-fill-available for true full-screen on iOS Safari */
+        height: 100vh;
+        height: -webkit-fill-available;
         height: 100dvh;
-        height: 100svh;
-        /* Safe area — notch (top) & home indicator (bottom) */
-        padding-top: env(safe-area-inset-top, 0px);
+        max-height: 100dvh;
+        /* No padding-top here — .app-header already handles safe-area-inset-top */
       }
 
       /* Safe area for scrollable areas at bottom */
@@ -1000,6 +1005,13 @@
       /* ─ Add form toggle — larger tap target */
       .add-toggle { padding: 14px 20px; font-size: 14px; min-height: 48px; }
       .add-form-inner { padding: 4px 16px 20px; gap: 10px; }
+      /* ─ Add form scroll fix: cap height so it doesn't overflow the card */
+      .add-form-body.expanded {
+        max-height: calc(100dvh - 240px);
+        max-height: calc(100svh - 240px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
 
       /* Stack description + deadline on mobile */
       .form-row { flex-direction: column; gap: 8px; }
@@ -1036,11 +1048,12 @@
       .form-actions { gap: 8px; }
 
       /* ─ Lists overview */
-      .lists-overview { padding: 16px 16px 16px; }
-      .lists-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .list-card { padding: 14px 14px 12px; }
-      .list-card-icon { font-size: 24px; margin-bottom: 8px; }
-      .list-card-name { font-size: 13px; }
+      .lists-overview { padding: 12px 12px 16px; }
+      .lists-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .list-card { padding: 11px 11px 10px; }
+      .list-card-icon { font-size: 20px; margin-bottom: 6px; }
+      .list-card-name { font-size: 12px; }
+      .list-card-meta { font-size: 11px; }
 
       /* ─ List detail */
       .list-detail-header { padding: 12px 16px 10px; gap: 10px; }
@@ -1069,7 +1082,7 @@
 
     /* ── Very small phones (SE, older Android) ──────────────── */
     @media (max-width: 360px) {
-      .lists-grid  { grid-template-columns: 1fr; }
+      .lists-grid  { grid-template-columns: repeat(2, 1fr); }
       .filter-btn  { padding: 6px 9px; font-size: 11px; }
       .page-tab    { padding: 7px 12px 9px; font-size: 12px; }
     }
